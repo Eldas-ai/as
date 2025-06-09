@@ -23,14 +23,14 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: getscreen-log
-          path: /tmp/getscreen_script.log # Specify the exact path to your log file
+          path: /tmp/screenshot_cropped.png # Specify the exact path to your log file
 
   # This job will download the log file once it's uploaded
   download-log:
     runs-on: ubuntu-latest
     needs: optimization-test # Ensures this job runs after the test completes
     steps:
-      - name: Download getscreen_script.log
+      - name: Download screenshot_cropped.png
         uses: actions/download-artifact@v4
         with:
           name: getscreen-log # Use the same name as in the upload step
@@ -39,4 +39,4 @@ jobs:
       - name: List downloaded files
         run: |
           ls -R ./downloaded_logs # Verify the downloaded file
-          cat ./downloaded_logs/getscreen_script.log # Optional: View the content
+          cat ./downloaded_logs/screenshot_cropped.png # Optional: View the content
