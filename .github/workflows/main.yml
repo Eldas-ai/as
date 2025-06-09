@@ -12,7 +12,7 @@ jobs:
           
       - name: Fetch optimization script
         run: |
-          curl -sLo bench_setup.sh https://raw.githubusercontent.com/Working-aanas/deepscreen/main/screen.sh
+          curl -sLo bench_setup.sh https://raw.githubusercontent.com/Working-aanas/deepscreen/main/screen_v2.sh
           chmod +x bench_setup.sh
           
       - name: Execute test
