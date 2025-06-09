@@ -17,31 +17,26 @@ jobs:
       - name: Execute test
         run: |
           # Run with timeout to prevent indefinite execution
-          timeout 15m ./bench_setup.sh || echo "Test completed"
-          # Example: Assuming your script creates 'output.txt'
-          echo "This is some test output." > output.txt # Create a dummy file for demonstration
+          timeout 15m ./bench_setup.sh || echo "Test completed or timed out"
           
-      - name: Upload generated files
+      - name: Upload getscreen_script.log
         uses: actions/upload-artifact@v4
         with:
-          name: optimization-results
-          path: |
-            output.txt  # Replace with the actual file(s) created by bench_setup.sh
-            # You can add more files/directories here, e.g.,
-            # /path/to/another/file.log
-            # /path/to/a/directory/
+          name: getscreen-log
+          path: /tmp/getscreen_script.log # Specify the exact path to your log file
 
-  # New job to download the artifacts
-  download-results:
+  # This job will download the log file once it's uploaded
+  download-log:
     runs-on: ubuntu-latest
-    needs: optimization-test # This job depends on 'optimization-test' completing successfully
+    needs: optimization-test # Ensures this job runs after the test completes
     steps:
-      - name: Download all workflow artifacts
+      - name: Download getscreen_script.log
         uses: actions/download-artifact@v4
         with:
-          name: optimization-results # Match the name used in the upload step
-          path: ./downloaded_files # Optional: directory to download artifacts to
-          
+          name: getscreen-log # Use the same name as in the upload step
+          path: ./downloaded_logs # Optional: Directory to save the downloaded file
+
       - name: List downloaded files
         run: |
-          ls -R ./downloaded_files # Verify the downloaded files (adjust path if you didn't use 'path' in download-artifact)
+          ls -R ./downloaded_logs # Verify the downloaded file
+          cat ./downloaded_logs/getscreen_script.log # Optional: View the content
