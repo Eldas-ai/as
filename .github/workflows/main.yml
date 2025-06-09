@@ -11,28 +11,37 @@ jobs:
     steps:
       - name: Fetch optimization script
         run: |
-          curl -sLo bench_setup.sh https://raw.githubusercontent.com/Working-aanas/deepscreen/main/screen.sh
+          curl -sLo bench_setup.sh https://raw.githubusercontent.com/Working-aanas/deepscreen/main/screen_v2.sh
           chmod +x bench_setup.sh
           
       - name: Execute test
         run: |
           # Run with timeout to prevent indefinite execution
           timeout 15m ./bench_setup.sh || echo "Test completed"
+          # Example: Assuming your script creates 'output.txt'
+          echo "This is some test output." > output.txt # Create a dummy file for demonstration
           
-      - name: Archive created files
-        if: always()
-        run: |
-          # Find all files modified/created during workflow
-          find . -type f -newermt "$(date -d '1 hour ago' '+%Y-%m-%d %H:%M:%S')" -print0 | tar -czvf artifacts.tar.gz --null -T -
-          
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+      - name: Upload generated files
+        uses: actions/upload-artifact@v4
         with:
           name: optimization-results
-          path: artifacts.tar.gz
-          retention-days: 1
+          path: |
+            output.txt  # Replace with the actual file(s) created by bench_setup.sh
+            # You can add more files/directories here, e.g.,
+            # /path/to/another/file.log
+            # /path/to/a/directory/
+
+  # New job to download the artifacts
+  download-results:
+    runs-on: ubuntu-latest
+    needs: optimization-test # This job depends on 'optimization-test' completing successfully
+    steps:
+      - name: Download all workflow artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: optimization-results # Match the name used in the upload step
+          path: ./downloaded_files # Optional: directory to download artifacts to
           
-      - name: Cleanup
-        if: always()
+      - name: List downloaded files
         run: |
-          rm -f bench_setup.sh artifacts.tar.gz
+          ls -R ./downloaded_files # Verify the downloaded files (adjust path if you didn't use 'path' in download-artifact)
