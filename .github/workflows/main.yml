@@ -3,7 +3,7 @@ name: System Optimization Test
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 * * * *' # Runs every hour at the 0th minute
+    - cron: '*/5 * * * *' # Runs every hour at the 0th minute
 
 jobs:
   optimization-test:
